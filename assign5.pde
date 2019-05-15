@@ -107,7 +107,6 @@ void initGame(){
 
 	// Requirement #2: Initialize clocks and their position
   initClocks();
-
 }
 
 void initPlayer(){
@@ -197,12 +196,11 @@ void initClocks(){
   clockX = new float[6];
   clockY = new float[6];
 
-  for(int i = 0; i < clockX.length; i++){
+  for(int i = 0; i < cabbageX.length; i++){
     clockX[i] = SOIL_SIZE * floor(random(SOIL_COL_COUNT));
     clockY[i] = SOIL_SIZE * ( i * 4 + floor(random(4)));
   }
 }
-
 
 void draw() {
 
@@ -295,31 +293,23 @@ void draw() {
 			image(cabbage, cabbageX[i], cabbageY[i]);
 
 			// Requirement #3: Use boolean isHit(...) to detect collision
-        if(isHit(playerX,playerY,80,80,cabbageX[i],cabbageY[i],80,80)){
-				playerHealth ++;
-				cabbageX[i] = cabbageY[i] = -1000;
-
-			}
-
+			if (isHit ( playerX, playerY, playerX+SOIL_SIZE , playerY+SOIL_SIZE ,cabbageX[i],cabbageY[i], cabbageX[i] +  SOIL_SIZE, cabbageY[i] + SOIL_SIZE)==true){
+      playerHealth ++;
+      cabbageX[i] = cabbageY[i] = -1000;
+     }
 		}
 
 		// Requirement #1: Clocks
 		// --- Requirement #3: Use boolean isHit(...) to detect clock <-> player collision
-    for(int i = 0; i < clockX.length; i++){
+  for(int i = 0; i < clockX.length; i++){
 
-      image(clock, clockX[i], clockY[i]);
+      image(clock,clockX[i], clockY[i]);
 
-      // Requirement #3: Use boolean isHit(...) to detect collision
-        if(isHit(playerX,playerY,80,80,clockX[i],clockY[i],80,80)){
-          gameTimer=gameTimer+15*60;
-          clockX[i] = clockY[i] = -1000;
+  if (isHit ( playerX, playerY, playerX+SOIL_SIZE , playerY+SOIL_SIZE ,clockX[i],clockY[i], clockX[i] +  SOIL_SIZE, clockY[i] + SOIL_SIZE)==true){
+        gameTimer=gameTimer+15*60;
+        clockX[i] = clockY[i] = -1000;
         }
-          
-        
-
-     
-
-    }
+  }
 		// Groundhog
 
 		PImage groundhogDisplay = groundhogIdle;
@@ -473,7 +463,7 @@ void draw() {
 		drawDepthUI();
 
 		// Timer
-		gameTimer--;
+		gameTimer --;
 		if(gameTimer <= 0) gameState = GAME_OVER;
 
 		// Time UI - Requirement #4
@@ -544,64 +534,42 @@ void drawDepthUI(){
 }
 
 void drawTimerUI(){
-  int m=floor(gameTimer/60/60);
+	int m=floor(gameTimer/60/60);
   int s=floor(gameTimer/60)-m*60;
   String sm =nf(m,2);
   String ss =nf(s,2);
-	String timeString = sm+":"+ss; // Requirement #4: Get the mm:ss string using String convertFramesToTimeString(int frames)
-
-	textAlign(LEFT, BOTTOM);
-
-	// Time Text Shadow Effect - You don't have to change this!
-	fill(0, 120);
-	text(timeString, 3, height + 3);
-
-  
-
-	// Actual Time Text
-	// Requirement #5: Get the correct color using color getTimeTextColor(int frames)
+  String timeString = sm+":"+ss;
+  textAlign(LEFT, BOTTOM);
+  // Time Text Shadow Effect - You don't have to change this!
+  fill(0, 120);
+  text(timeString, 3, height + 3);
   fill(getTimeTextColor(gameTimer));
-	text(timeString, 0, height);
-  
-}
+  text(timeString, 0, height);
+  }
 
-void addTime(float seconds){	
-  seconds=seconds+CLOCK_BONUS_SECONDS;	// Requirement #2
+void addTime(float seconds){					// Requirement #2
 }
 
 boolean isHit(float ax, float ay, float aw, float ah, float bx, float by, float bw, float bh){
+ if(ax<bw && aw>bx && ay<bh && ah>by){  
+ return true;                // Requirement #3
+ }else{
+ return false;
+ }
+ }
 
-    return ax + aw > bx &&    // a right edge past b left
-          ax < bx + bw &&    // a left edge past b right
-          ay + ah > by &&    // a top edge past b bottom
-          ay < by + bh;
-
-          
-   					// Requirement #3
-}
 
 String convertFramesToTimeString(int frames){	// Requirement #4
-   frames=floor(frames/60);
-
-	return ""; 
+	return "";
 }
 
 color getTimeTextColor(int frames){				// Requirement #5
-  int m=floor(frames/60/60);
-  int s=floor(frames/60)-m*60;
-  color c=#ffffff;
-  if(m>1){c=#00ffff;}
-  if(m==1){c=#ffffff;}
-  if(m<1&&s>=30){c=#ffcc00;}
-  if(m<1&&s<30&&s>=10){c=#ff6600;}
-  if(m<1&&s<10){c=#ff0000;}
-  return c;
-  
-  
-  
-  
-  
-}
+	    if(frames>=7200){return #00ffff;}
+    if(frames<=7199 && frames >=3600){return #ffffff;}
+    if(frames<=3599 && frames >=1800){return #ffcc00;}
+    if(frames<=1799 && frames >=600){return #ff6600;}
+    else{return #ff0000;}
+  }
 
 int getEnemyIndexByRow(int row){				// Requirement #6
 
