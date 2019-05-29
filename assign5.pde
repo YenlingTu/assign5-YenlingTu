@@ -199,6 +199,9 @@ void initClocks(){
   for(int i = 0; i < cabbageX.length; i++){
     clockX[i] = SOIL_SIZE * floor(random(SOIL_COL_COUNT));
     clockY[i] = SOIL_SIZE * ( i * 4 + floor(random(4)));
+     if(clockX[i]==cabbageX[i]&&clockY[i]==cabbageY[i]){
+      i--; 
+     }
   }
 }
 
@@ -295,6 +298,7 @@ void draw() {
       // Requirement #3: Use boolean isHit(...) to detect collision
       if (isHit ( playerX, playerY, playerX+SOIL_SIZE , playerY+SOIL_SIZE ,cabbageX[i],cabbageY[i], cabbageX[i] +  SOIL_SIZE, cabbageY[i] + SOIL_SIZE)==true){
       playerHealth ++;
+      if(playerHealth>5){playerHealth=5;}
       cabbageX[i] = cabbageY[i] = -1000;
      }
     }
@@ -429,13 +433,11 @@ void draw() {
       image(soldier, soldierX[i], soldierY[i]);
 
       // Requirement #3: Use boolean isHit(...) to detect collision
-      if(soldierX[i] + SOIL_SIZE > playerX    // r1 right edge past r2 left
-        && soldierX[i] < playerX + SOIL_SIZE    // r1 left edge past r2 right
-        && soldierY[i] + SOIL_SIZE > playerY    // r1 top edge past r2 bottom
-        && soldierY[i] < playerY + SOIL_SIZE) { // r1 bottom edge past r2 top
-
+    if (isHit ( playerX, playerY, playerX+SOIL_SIZE , playerY+SOIL_SIZE ,soldierX[i],soldierY[i], soldierX[i] +  SOIL_SIZE, soldierY[i] + SOIL_SIZE)==true){
         playerHealth --;
 
+
+        
         if(playerHealth == 0){
 
           gameState = GAME_OVER;
@@ -534,11 +536,7 @@ void drawDepthUI(){
 }
 
 void drawTimerUI(){
-  int m=floor(gameTimer/60/60);
-  int s=floor(gameTimer/60)-m*60;
-  String sm =nf(m,2);
-  String ss =nf(s,2);
-  String timeString = sm+":"+ss;
+  String timeString = convertFramesToTimeString (gameTimer);
   textAlign(LEFT, BOTTOM);
   // Time Text Shadow Effect - You don't have to change this!
   fill(0, 120);
@@ -548,6 +546,7 @@ void drawTimerUI(){
   }
 
 void addTime(float seconds){          // Requirement #2
+ gameTimer+=seconds*60;
 }
 
 boolean isHit(float ax, float ay, float aw, float ah, float bx, float by, float bw, float bh){
@@ -560,7 +559,15 @@ boolean isHit(float ax, float ay, float aw, float ah, float bx, float by, float 
 
 
 String convertFramesToTimeString(int frames){  // Requirement #4
-  return "";
+ int num,ber;
+ num=frames/60/60;
+ println(num);
+ ber=(frames/60)%60;
+ 
+ String frontNum=nf(num,2);
+ String backNum=nf(ber,2);
+ 
+  return frontNum+":"+backNum;
 }
 
 color getTimeTextColor(int frames){        // Requirement #5
